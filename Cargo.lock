@@ -1128,7 +1128,7 @@ dependencies = [
 [[package]]
 name = "shrs"
 version = "0.0.2"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#a5c3736f676d9be4692122312a8c2857f2ad9eed"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#8ab155da947cae6b0ee35ae53f8d36c309510f15"
 dependencies = [
  "anyhow",
  "anymap",
@@ -1153,7 +1153,7 @@ dependencies = [
 [[package]]
 name = "shrs_core"
 version = "0.0.2"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#a5c3736f676d9be4692122312a8c2857f2ad9eed"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#8ab155da947cae6b0ee35ae53f8d36c309510f15"
 dependencies = [
  "anyhow",
  "anymap",
@@ -1177,7 +1177,7 @@ dependencies = [
 [[package]]
 name = "shrs_job"
 version = "0.0.2"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#a5c3736f676d9be4692122312a8c2857f2ad9eed"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#8ab155da947cae6b0ee35ae53f8d36c309510f15"
 dependencies = [
  "anyhow",
  "lazy_static",
@@ -1189,7 +1189,7 @@ dependencies = [
 [[package]]
 name = "shrs_lang"
 version = "0.0.2"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#a5c3736f676d9be4692122312a8c2857f2ad9eed"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#8ab155da947cae6b0ee35ae53f8d36c309510f15"
 dependencies = [
  "anyhow",
  "lalrpop",
@@ -1206,7 +1206,7 @@ dependencies = [
 [[package]]
 name = "shrs_line"
 version = "0.0.2"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#a5c3736f676d9be4692122312a8c2857f2ad9eed"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#8ab155da947cae6b0ee35ae53f8d36c309510f15"
 dependencies = [
  "anyhow",
  "arboard",
@@ -1233,7 +1233,7 @@ dependencies = [
 [[package]]
 name = "shrs_utils"
 version = "0.0.2"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#a5c3736f676d9be4692122312a8c2857f2ad9eed"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#8ab155da947cae6b0ee35ae53f8d36c309510f15"
 dependencies = [
  "anyhow",
  "crossterm",
@@ -1246,7 +1246,7 @@ dependencies = [
 [[package]]
 name = "shrs_vi"
 version = "0.0.2"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#a5c3736f676d9be4692122312a8c2857f2ad9eed"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#8ab155da947cae6b0ee35ae53f8d36c309510f15"
 dependencies = [
  "anyhow",
  "lalrpop",
