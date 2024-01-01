@@ -7,7 +7,7 @@ impl BuiltinCmd for PresenceBuiltin {
         sh: &shrs::prelude::Shell,
         ctx: &mut shrs::prelude::Context,
         rt: &mut shrs::prelude::Runtime,
-        args: &Vec<String>,
+        args: &[String],
     ) -> Result<shrs::prelude::CmdOutput> {
         todo!()
     }
