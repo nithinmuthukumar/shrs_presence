@@ -32,7 +32,7 @@ impl Default for PresencePlugin {
 }
 
 impl Plugin for PresencePlugin {
-    fn init(&self, shell: &mut shrs::ShellConfig) -> anyhow::Result<()> {
+    fn init(&self, shell: &mut ShellConfig) -> anyhow::Result<()> {
         let mut state = PresenceState::new();
         state.connect();
 

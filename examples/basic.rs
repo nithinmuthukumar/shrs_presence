@@ -1,4 +1,4 @@
-use shrs::ShellBuilder;
+use shrs::prelude::*;
 use shrs_presence::PresencePlugin;
 
 fn main() {
