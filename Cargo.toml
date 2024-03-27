@@ -1,3 +1,8 @@
+[workspace]
+members = [
+    "shrs_presence_server",
+]
+
 [package]
 name = "shrs_presence"
 version = "0.1.0"
@@ -5,7 +10,15 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[workspace.package]
+authors = ["nithinmuthukumar"]
+categories = ["command-line-interface", "command-line-utilities", "development-tools"]
+edition = "2021"
+keywords = ["shrs", "shell", "posix", "unix"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/nithinmuthukumar/shrs_presence.git"
+
+
 [dependencies]
 clap = "4.4.14"
-discord-rich-presence = "0.2.3"
 shrs = {git="https://github.com/MrPicklePinosaur/shrs.git"}
