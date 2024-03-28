@@ -1,24 +1,26 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fmt::format,
     path::PathBuf,
     rc::Rc,
     sync::{Arc, Mutex},
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 use discord_rich_presence::{
     activity::{Activity, Assets, Button, Timestamps},
     DiscordIpc, DiscordIpcClient,
 };
+use uuid::Uuid;
 
 pub struct PresenceState {
     pub client: DiscordIpcClient,
     pub connected: bool,
     pub start: i64,
     pub commands_used: i32,
-    pub sessions: u32,
+    pub sessions: HashMap<Uuid, Instant>,
     pub buttons: HashMap<String, String>,
+    pub last_command: String,
 }
 impl PresenceState {
     pub fn new() -> Self {
@@ -30,25 +32,30 @@ impl PresenceState {
         Self {
             client: DiscordIpcClient::new("1188721913586003988").unwrap(),
 
-            start: SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .unwrap()
-                .as_millis() as i64,
+            start: 0,
             commands_used: 0,
-            sessions: 0,
+            sessions: HashMap::new(),
             connected: false,
             buttons,
+            last_command: String::new(),
         }
     }
-    pub fn connect(&mut self) -> bool {
-        self.connected = self.client.connect().is_ok();
-        dbg!(self.connected);
+    pub fn connect(&mut self, session: Uuid) {
+        if self.sessions.len() == 0 {
+            self.start = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_millis() as i64
+        }
+        self.sessions.insert(session, Instant::now());
 
-        self.connected
+        if !self.connected {
+            self.connected = self.client.connect().is_ok();
+        }
     }
     pub fn disconnect(&mut self) {
         self.connected = false;
-        self.client.close();
+        self.client.close().unwrap();
     }
 
     pub fn update_activity(&mut self) {
@@ -58,9 +65,9 @@ impl PresenceState {
 
         let details = format!(
             "Sessions {}; Commands {};",
-            self.sessions, self.commands_used
+            self.sessions.len(),
+            self.commands_used
         );
-        let state = format!("cd ~");
         let activity_buttons = self
             .buttons
             .iter()
@@ -69,7 +76,7 @@ impl PresenceState {
         self.client
             .set_activity(
                 Activity::new()
-                    .state(state.as_str())
+                    .state(format!("> {}", self.last_command).as_str())
                     .details(details.as_str())
                     .timestamps(Timestamps::new().start(self.start))
                     .buttons(activity_buttons)
@@ -79,5 +86,9 @@ impl PresenceState {
     }
     pub fn clear_activity(&mut self) {
         self.client.clear_activity().unwrap();
+    }
+    pub fn drop_dead_sessions(&mut self) {
+        self.sessions
+            .retain(|_, v| v.elapsed() < Duration::from_secs(20));
     }
 }

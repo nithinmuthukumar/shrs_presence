@@ -6,5 +6,5 @@ fn main() {
         .with_plugin(PresencePlugin::default())
         .build()
         .unwrap();
-    myshell.run();
+    myshell.run().unwrap();
 }

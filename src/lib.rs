@@ -1,22 +1,17 @@
 mod builtin;
-pub mod state;
-use std::{
-    os::unix::process::ExitStatusExt,
-    path::PathBuf,
-    time::{SystemTime, UNIX_EPOCH},
-};
 
 use builtin::PresenceBuiltin;
-use discord_rich_presence::{
-    activity::{self, Activity, Button, Timestamps},
-    DiscordIpc, DiscordIpcClient,
-};
-use shrs::{
-    anyhow::{self, anyhow, Result},
-    prelude::*,
-};
-use state::PresenceState;
-
+use serde_json::json;
+use shrs::{anyhow::Result, prelude::*};
+use uuid::Uuid;
+pub struct PresenceState {
+    id: Uuid,
+}
+impl PresenceState {
+    pub fn new() -> Self {
+        Self { id: Uuid::new_v4() }
+    }
+}
 pub struct PresencePlugin {
     shell_repo: String,
 }
@@ -33,69 +28,44 @@ impl Default for PresencePlugin {
 
 impl Plugin for PresencePlugin {
     fn init(&self, shell: &mut ShellConfig) -> anyhow::Result<()> {
-        let mut state = PresenceState::new();
-        state.connect();
-
         shell.builtins.insert("presence", PresenceBuiltin {});
-        shell.state.insert(state);
+        shell.state.insert(PresenceState::new());
         shell.hooks.insert(startup_hook);
-        shell.hooks.insert(update_activity_hook);
-        shell.hooks.insert(after_hook);
+        shell.hooks.insert(command_hook);
 
         Ok(())
     }
 }
-fn after_hook(
-    _sh: &Shell,
-    sh_ctx: &mut Context,
-    sh_rt: &mut Runtime,
-    ctx: &AfterCommandCtx,
-) -> anyhow::Result<()> {
-    if let Some(state) = sh_ctx.state.get_mut::<PresenceState>() {
-        state.commands_used += 1;
-        state.working_dir = sh_rt.working_dir.clone();
-
-        if !ctx.command.is_empty() {
-            state.update_activity(
-                format!(
-                    "> \"{}\" (code: {})",
-                    ctx.command,
-                    ctx.cmd_output.status.into_raw()
-                )
-                .as_str(),
-            );
-        }
-    }
-
-    Ok(())
-}
-
-fn update_activity_hook(
+fn command_hook(
     _sh: &Shell,
     sh_ctx: &mut Context,
     sh_rt: &mut Runtime,
     ctx: &BeforeCommandCtx,
-) -> anyhow::Result<()> {
-    if let Some(state) = sh_ctx.state.get_mut::<PresenceState>() {
-        state.commands_used += 1;
-        state.working_dir = sh_rt.working_dir.clone();
-        if !ctx.command.is_empty() {
-            state.update_activity(format!("> \"{}\"", ctx.command).as_str());
-        }
+) -> Result<()> {
+    let client = reqwest::blocking::Client::new();
+    if let Some(state) = sh_ctx.state.get::<PresenceState>() {
+        let data = json!({ "id":state.id.to_string() });
+        let res = client
+            .post("http://127.0.0.1:3000/command/add")
+            .json(&data)
+            .send()?;
     }
-
     Ok(())
 }
+
 fn startup_hook(
     _sh: &Shell,
     sh_ctx: &mut Context,
     sh_rt: &mut Runtime,
     ctx: &StartupCtx,
-) -> anyhow::Result<()> {
-    if let Some(state) = sh_ctx.state.get_mut::<PresenceState>() {
-        state.commands_used += 1;
-        state.working_dir = sh_rt.working_dir.clone();
-        state.update_activity("Starting Shell");
+) -> Result<()> {
+    let client = reqwest::blocking::Client::new();
+    if let Some(state) = sh_ctx.state.get::<PresenceState>() {
+        let data = json!({ "id":state.id.to_string() });
+        let res = client
+            .post("http://127.0.0.1:3000/connect")
+            .json(&data)
+            .send()?;
     }
 
     Ok(())

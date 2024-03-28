@@ -1,48 +1,83 @@
-use std::sync::{Arc, Mutex};
-
-use axum::{extract::State, http::StatusCode, routing::get, Router};
+use axum::{
+    extract::State,
+    http::StatusCode,
+    routing::{get, post},
+    Json, Router,
+};
+use serde::Deserialize;
 use state::PresenceState;
+use std::{
+    process::exit,
+    sync::{Arc, Mutex},
+    time::Duration,
+};
+use uuid::Uuid;
 
 mod state;
 
 type PState = Arc<Mutex<PresenceState>>;
 #[tokio::main]
 async fn main() {
-    let mut state = PresenceState::new();
-    state.connect();
-    state.update_activity();
-    let app = Router::new()
-        // .route("/connect")
-        // .route("/disconnect")
-        .route("/session/add", get(add_session))
-        .route("/session/remove", get(remove_session))
-        .route("/commands/add", get(add_command))
-        .with_state(Arc::new(Mutex::new(state)));
+    let state = Arc::new(Mutex::new(PresenceState::new()));
+    tokio::spawn(heartbeat(state.clone()));
 
-    // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let app = Router::new()
+        .route("/connect", post(connect))
+        // .route("/disconnect")
+        .route("/disconnect", post(disconnect))
+        .route("/command/add", post(add_command))
+        .with_state(state);
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
     axum::serve(listener, app).await.unwrap();
 }
-async fn add_session(State(mut s): State<PState>) -> StatusCode {
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Session {
+    id: String,
+}
+async fn connect(State(s): State<PState>, Json(body): Json<Session>) -> StatusCode {
+    dbg!("Connect");
+    dbg!(body.clone());
     let mut state = s.lock().unwrap();
-    state.sessions += 1;
+    match Uuid::parse_str(body.id.as_str()) {
+        Ok(id) => {
+            state.connect(id);
+            state.update_activity();
+            StatusCode::OK
+        }
+        Err(_) => StatusCode::BAD_REQUEST,
+    }
+}
+
+async fn disconnect(State(s): State<PState>) -> StatusCode {
+    let mut state = s.lock().unwrap();
+    // state.sessions -= 1;
     state.update_activity();
 
     StatusCode::OK
 }
 
-async fn remove_session(State(mut s): State<PState>) -> StatusCode {
-    let mut state = s.lock().unwrap();
-    state.sessions -= 1;
-    state.update_activity();
-
-    StatusCode::OK
-}
-
-async fn add_command(State(mut s): State<PState>) -> StatusCode {
+async fn add_command(State(s): State<PState>, body: String) -> StatusCode {
     let mut state = s.lock().unwrap();
     state.commands_used += 1;
+    state.last_command = body;
     state.update_activity();
 
     StatusCode::OK
+}
+async fn heartbeat(s: PState) {
+    loop {
+        tokio::time::sleep(Duration::from_secs(20)).await;
+
+        let mut state = s.lock().unwrap();
+        state.drop_dead_sessions();
+        if state.sessions.len() == 0 {
+            exit(0)
+        }
+
+        state.update_activity();
+    }
 }
