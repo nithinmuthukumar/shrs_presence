@@ -2086,6 +2086,7 @@ name = "shrs_presence"
 version = "0.1.0"
 dependencies = [
  "clap 4.5.4",
+ "dirs",
  "reqwest",
  "serde_json",
  "shrs",
