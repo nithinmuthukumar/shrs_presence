@@ -69,10 +69,9 @@ fn command_hook(
 ) -> Result<()> {
     let client = reqwest::blocking::Client::new();
     if let Some(state) = sh_ctx.state.get::<PresenceState>() {
-        let data = json!({ "id":state.id.to_string() });
         let _ = client
             .post(state.url.clone() + "/command/add")
-            .json(&data)
+            .body(ctx.command.clone())
             .send();
     }
     Ok(())
