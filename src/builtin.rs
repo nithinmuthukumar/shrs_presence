@@ -4,16 +4,15 @@ use shrs::{
     prelude::{BuiltinCmd, CmdOutput},
 };
 
+use crate::PresenceState;
+
 #[derive(Debug, Parser)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
 }
 #[derive(Debug, Subcommand)]
-enum Commands {
-    Connect,
-    Disconnect,
-}
+enum Commands {}
 pub struct PresenceBuiltin {}
 impl BuiltinCmd for PresenceBuiltin {
     fn run(
@@ -24,27 +23,14 @@ impl BuiltinCmd for PresenceBuiltin {
         args: &[String],
     ) -> Result<shrs::prelude::CmdOutput> {
         let cli = Cli::try_parse_from(args)?;
-        if let Some(c) = cli.command {
-            match c {
-                Commands::Connect => {
-                    let success = true;
-                    if !success {
-                        ctx.out.eprintln("Could not connect to discord")?;
-                        return Ok(CmdOutput::error());
-                    } else {
-                        ctx.out.println("Connected")?;
-                    }
-                }
-                Commands::Disconnect => {
-                    // state.disconnect();
-                    ctx.out.println("Disconnected")?;
+        if let Some(state) = ctx.state.get_mut::<PresenceState>() {
+            if let Some(c) = cli.command {
+            } else {
+                match reqwest::blocking::get(state.url.clone() + "/info") {
+                    Ok(res) => ctx.out.println(res.text()?)?,
+                    Err(_) => ctx.out.println("No server running")?,
                 }
             }
-        } else {
-            // ctx.out.println(format!(
-            //     "client_id:{}\nconnected:{}",
-            //     state.client.client_id, state.connected
-            // ))?;
         }
         Ok(CmdOutput::success())
     }

@@ -5,7 +5,7 @@ use axum::{
     Json, Router,
 };
 use serde::Deserialize;
-use state::PresenceState;
+use state::{PresenceInfo, PresenceState};
 use std::{
     process::exit,
     sync::{Arc, Mutex},
@@ -23,9 +23,9 @@ async fn main() {
 
     let app = Router::new()
         .route("/connect", post(connect))
-        // .route("/disconnect")
         .route("/disconnect", post(disconnect))
         .route("/command/add", post(add_command))
+        .route("/info", get(info))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
@@ -54,10 +54,13 @@ async fn connect(State(s): State<PState>, Json(body): Json<Session>) -> StatusCo
 
 async fn disconnect(State(s): State<PState>) -> StatusCode {
     let mut state = s.lock().unwrap();
-    // state.sessions -= 1;
-    state.update_activity();
+    state.disconnect();
 
     StatusCode::OK
+}
+async fn info(State(s): State<PState>) -> Json<PresenceInfo> {
+    let state = s.lock().unwrap();
+    Json(state.info())
 }
 
 async fn add_command(State(s): State<PState>, body: String) -> StatusCode {
@@ -70,7 +73,7 @@ async fn add_command(State(s): State<PState>, body: String) -> StatusCode {
 }
 async fn heartbeat(s: PState) {
     loop {
-        tokio::time::sleep(Duration::from_secs(20)).await;
+        tokio::time::sleep(Duration::from_secs(30)).await;
 
         let mut state = s.lock().unwrap();
         state.drop_dead_sessions();

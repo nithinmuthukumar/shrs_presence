@@ -1,15 +1,38 @@
 mod builtin;
 
+use std::time::Duration;
+
 use builtin::PresenceBuiltin;
+use reqwest::Client;
 use serde_json::json;
 use shrs::{anyhow::Result, prelude::*};
 use uuid::Uuid;
 pub struct PresenceState {
+    url: String,
     id: Uuid,
+    _rt: tokio::runtime::Runtime,
 }
 impl PresenceState {
-    pub fn new() -> Self {
-        Self { id: Uuid::new_v4() }
+    pub fn new(url: String) -> Self {
+        let id = Uuid::new_v4();
+        let u = url.clone();
+
+        let tokio_rt = tokio::runtime::Runtime::new().unwrap();
+        tokio_rt.spawn(async move {
+            let data = json!({ "id":id.to_string() });
+
+            let client = Client::new();
+            loop {
+                tokio::time::sleep(Duration::from_secs(20)).await;
+                client.post(u.clone() + "/connect").json(&data).send().await;
+            }
+        });
+
+        Self {
+            id,
+            _rt: tokio_rt,
+            url,
+        }
     }
 }
 pub struct PresencePlugin {
@@ -29,7 +52,9 @@ impl Default for PresencePlugin {
 impl Plugin for PresencePlugin {
     fn init(&self, shell: &mut ShellConfig) -> anyhow::Result<()> {
         shell.builtins.insert("presence", PresenceBuiltin {});
-        shell.state.insert(PresenceState::new());
+        shell
+            .state
+            .insert(PresenceState::new("http://127.0.0.1:3000".to_string()));
         shell.hooks.insert(startup_hook);
         shell.hooks.insert(command_hook);
 
@@ -45,10 +70,10 @@ fn command_hook(
     let client = reqwest::blocking::Client::new();
     if let Some(state) = sh_ctx.state.get::<PresenceState>() {
         let data = json!({ "id":state.id.to_string() });
-        let res = client
-            .post("http://127.0.0.1:3000/command/add")
+        let _ = client
+            .post(state.url.clone() + "/command/add")
             .json(&data)
-            .send()?;
+            .send();
     }
     Ok(())
 }
@@ -62,10 +87,10 @@ fn startup_hook(
     let client = reqwest::blocking::Client::new();
     if let Some(state) = sh_ctx.state.get::<PresenceState>() {
         let data = json!({ "id":state.id.to_string() });
-        let res = client
-            .post("http://127.0.0.1:3000/connect")
+        let _ = client
+            .post(state.url.clone() + "/connect")
             .json(&data)
-            .send()?;
+            .send();
     }
 
     Ok(())

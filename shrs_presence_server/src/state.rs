@@ -11,7 +11,14 @@ use discord_rich_presence::{
     activity::{Activity, Assets, Button, Timestamps},
     DiscordIpc, DiscordIpcClient,
 };
+use serde::Serialize;
 use uuid::Uuid;
+#[derive(Serialize)]
+pub struct PresenceInfo {
+    pub connected: bool,
+    pub commands_used: i32,
+    pub sessions: usize,
+}
 
 pub struct PresenceState {
     pub client: DiscordIpcClient,
@@ -56,6 +63,13 @@ impl PresenceState {
     pub fn disconnect(&mut self) {
         self.connected = false;
         self.client.close().unwrap();
+    }
+    pub fn info(&self) -> PresenceInfo {
+        PresenceInfo {
+            connected: self.connected,
+            commands_used: self.commands_used,
+            sessions: self.sessions.len(),
+        }
     }
 
     pub fn update_activity(&mut self) {
