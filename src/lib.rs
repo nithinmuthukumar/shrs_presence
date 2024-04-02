@@ -92,7 +92,6 @@ fn setup_presence_daemon(config_dir: &PathBuf) -> Result<()> {
         );
         File::create(plist_file.clone())?.write_all(s.as_bytes())?;
     }
-    dbg!(plist_file.clone());
     let output = Command::new("launchctl")
         .arg("load")
         .arg(plist_file)

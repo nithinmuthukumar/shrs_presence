@@ -78,6 +78,7 @@ async fn heartbeat(s: PState) {
         let mut state = s.lock().unwrap();
         state.drop_dead_sessions();
         if state.sessions.len() == 0 {
+            drop(state);
             exit(0)
         }
 
