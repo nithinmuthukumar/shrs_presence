@@ -1,13 +1,9 @@
 [workspace]
 members = [
     "shrs_presence_server",
+    "shrs_presence"
 ]
 
-[package]
-name = "shrs_presence"
-version = "0.1.0"
-edition = "2021"
-description = "Discord Rich presence Plugin for shrs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -20,11 +16,3 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/nithinmuthukumar/shrs_presence.git"
 
 
-[dependencies]
-clap = "4.4.14"
-reqwest = {version = "0.12.2",features = ["blocking", "json"]}
-serde_json = "1.0.115"
-shrs = {git="https://github.com/MrPicklePinosaur/shrs.git"}
-uuid = {version = "1.8.0", features = ["v4" ]}
-tokio = { version = "1.36.0", features = ["full"] }
-dirs = "5"

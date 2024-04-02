@@ -1998,7 +1998,7 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 [[package]]
 name = "shrs"
 version = "0.0.4"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#741f2f7cb809035bc7938025ff3fe1b5aab55087"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#00591eb17c881ab1ac40061b467e0911b28d99fe"
 dependencies = [
  "anyhow",
  "anymap",
@@ -2022,7 +2022,7 @@ dependencies = [
 [[package]]
 name = "shrs_core"
 version = "0.0.4"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#741f2f7cb809035bc7938025ff3fe1b5aab55087"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#00591eb17c881ab1ac40061b467e0911b28d99fe"
 dependencies = [
  "anyhow",
  "anymap",
@@ -2054,7 +2054,7 @@ dependencies = [
 [[package]]
 name = "shrs_job"
 version = "0.0.4"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#741f2f7cb809035bc7938025ff3fe1b5aab55087"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#00591eb17c881ab1ac40061b467e0911b28d99fe"
 dependencies = [
  "anyhow",
  "lazy_static",
@@ -2066,7 +2066,7 @@ dependencies = [
 [[package]]
 name = "shrs_lang"
 version = "0.0.4"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#741f2f7cb809035bc7938025ff3fe1b5aab55087"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#00591eb17c881ab1ac40061b467e0911b28d99fe"
 dependencies = [
  "anyhow",
  "dirs",
@@ -2109,7 +2109,7 @@ dependencies = [
 [[package]]
 name = "shrs_utils"
 version = "0.0.4"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#741f2f7cb809035bc7938025ff3fe1b5aab55087"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#00591eb17c881ab1ac40061b467e0911b28d99fe"
 dependencies = [
  "anyhow",
  "crossterm",
@@ -2122,7 +2122,7 @@ dependencies = [
 [[package]]
 name = "shrs_vi"
 version = "0.0.4"
-source = "git+https://github.com/MrPicklePinosaur/shrs.git#741f2f7cb809035bc7938025ff3fe1b5aab55087"
+source = "git+https://github.com/MrPicklePinosaur/shrs.git#00591eb17c881ab1ac40061b467e0911b28d99fe"
 dependencies = [
  "anyhow",
  "lalrpop",
