@@ -66,9 +66,8 @@ fn setup_presence_daemon(config_dir: &PathBuf) -> Result<()> {
     if let Some(parent) = plist_file.parent() {
         fs::create_dir_all(parent)?;
     }
-    if !plist_file.exists() {
-        let s = format!(
-            r#"<?xml version="1.0" encoding="UTF-8"?>
+    let s = format!(
+        r#"<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
    <dict>
@@ -84,12 +83,11 @@ fn setup_presence_daemon(config_dir: &PathBuf) -> Result<()> {
        <string>{}/presence/error.log</string>
    </dict>
 </plist>"#,
-            cargo_dir.to_string_lossy(),
-            config_dir.to_string_lossy(),
-            config_dir.to_string_lossy()
-        );
-        File::create(plist_file.clone())?.write_all(s.as_bytes())?;
-    }
+        cargo_dir.to_string_lossy(),
+        config_dir.to_string_lossy(),
+        config_dir.to_string_lossy()
+    );
+    File::create(plist_file.clone())?.write_all(s.as_bytes())?;
     let output = Command::new("launchctl")
         .arg("load")
         .arg(plist_file)
