@@ -6,11 +6,8 @@ use axum::{
 };
 use serde::Deserialize;
 use state::{PresenceInfo, PresenceState};
-use std::{
-    process::exit,
-    sync::{Arc, Mutex},
-    time::Duration,
-};
+use std::{process::exit, sync::Arc, time::Duration};
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 mod state;
@@ -41,7 +38,7 @@ pub struct Session {
 async fn connect(State(s): State<PState>, Json(body): Json<Session>) -> StatusCode {
     dbg!("Connect");
     dbg!(body.clone());
-    let mut state = s.lock().unwrap();
+    let mut state = s.lock().await;
     match Uuid::parse_str(body.id.as_str()) {
         Ok(id) => {
             state.connect(id);
@@ -53,18 +50,18 @@ async fn connect(State(s): State<PState>, Json(body): Json<Session>) -> StatusCo
 }
 
 async fn disconnect(State(s): State<PState>) -> StatusCode {
-    let mut state = s.lock().unwrap();
+    let mut state = s.lock().await;
     state.disconnect();
 
     StatusCode::OK
 }
 async fn info(State(s): State<PState>) -> Json<PresenceInfo> {
-    let state = s.lock().unwrap();
+    let state = s.lock().await;
     Json(state.info())
 }
 
 async fn add_command(State(s): State<PState>, body: String) -> StatusCode {
-    let mut state = s.lock().unwrap();
+    let mut state = s.lock().await;
     state.commands_used += 1;
     state.last_command = body;
     state.update_activity();
@@ -75,7 +72,7 @@ async fn heartbeat(s: PState) {
     loop {
         tokio::time::sleep(Duration::from_secs(30)).await;
 
-        let mut state = s.lock().unwrap();
+        let mut state = s.lock().await;
         state.drop_dead_sessions();
         if state.sessions.len() == 0 {
             drop(state);

@@ -78,8 +78,6 @@ fn setup_presence_daemon(config_dir: &PathBuf) -> Result<()> {
        <string>{}</string>
        <key>RunAtLoad</key>
        <true/>
-       <key>KeepAlive</key>
-       <true/>
        <key>StandardOutPath</key>
        <string>{}/presence/logfile.log</string>
        <key>StandardErrorPath</key>
